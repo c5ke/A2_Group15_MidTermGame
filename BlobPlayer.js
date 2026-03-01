@@ -31,8 +31,11 @@ class BlobPlayer {
     this.energyRegenStill = 0.6;
     this.energySprintingCost = 0.4;
     this.energyJumpCost = 10;
+    this.energyDoubleJumpCost = 30;
     this.isSprinting = false;
     this.starsCollected = 0;
+    this.canDoubleJump = false;
+    this.ridingPlatform = null;
   }
 
   spawnFromLevel(level) {
@@ -43,6 +46,8 @@ class BlobPlayer {
     this.vx = 0;
     this.vy = 0;
     this.onGround = false;
+    this.canDoubleJump = false;
+    this.ridingPlatform = null;
 
     this.gravity = level.gravity;
     this.jumpV = level.jumpV;
@@ -55,7 +60,16 @@ class BlobPlayer {
       const energyFactor = map(this.energy, 0, this.maxEnergy, 0.5, 1.0);
       this.vy = this.jumpV * energyFactor;
       this.onGround = false;
+      this.canDoubleJump = true; // Allow double jump after first jump
       this.energy = max(0, this.energy - this.energyJumpCost);
+      this.ridingPlatform = null;
+    } else if (!this.onGround && this.canDoubleJump && this.energy > this.maxEnergy / 2) {
+      // Double jump logic: only if in air, has double jump flag, and > 50% energy
+      const energyFactor = map(this.energy, 0, this.maxEnergy, 0.5, 1.0);
+      this.vy = this.jumpV * energyFactor * 0.8; // slightly weaker than normal jump
+      this.canDoubleJump = false; // consume the double jump
+      this.energy = max(0, this.energy - this.energyDoubleJumpCost);
+      this.ridingPlatform = null;
     }
   }
 
@@ -64,6 +78,19 @@ class BlobPlayer {
     let move = 0;
     if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) move -= 1;
     if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) move += 1;
+
+    // Reset double jump if we land
+    if (this.onGround) {
+      this.canDoubleJump = false;
+    }
+
+    // Apply platform movement if riding one
+    if (this.ridingPlatform && this.ridingPlatform.isMoving) {
+      if (this.ridingPlatform.lastX !== undefined) {
+        this.x += this.ridingPlatform.x - this.ridingPlatform.lastX;
+        this.y += this.ridingPlatform.y - this.ridingPlatform.lastY;
+      }
+    }
 
     // Sprinting logic
     this.isSprinting = keyIsDown(SHIFT) && move !== 0 && this.energy > 0;
@@ -112,15 +139,16 @@ class BlobPlayer {
       }
     }
 
-    // move Y
     box.y += this.vy;
     this.onGround = false;
+    this.ridingPlatform = null; // Reset riding platform before check
     for (const s of level.platforms) {
       if (BlobPlayer.overlap(box, s)) {
         if (this.vy > 0) {
           box.y = s.y - box.h;
           this.vy = 0;
           this.onGround = true;
+          this.ridingPlatform = s; // Set the platform we are standing on
         } else if (this.vy < 0) {
           box.y = s.y + s.h;
           this.vy = 0;

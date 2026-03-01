@@ -17,6 +17,8 @@ class Platform {
   }
 
   update() {
+    this.lastX = this.x;
+    this.lastY = this.y;
     if (this.isMoving) {
       let t = frameCount * this.speed + this.offset;
       this.x = this.baseX + cos(t) * this.rangeX;
