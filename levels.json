@@ -24,7 +24,7 @@
           { "x": 1500, "y": 284, "w": 110, "h": 12, "color": "darkcyan",
             "options": { "isMoving": true, "rangeX": 80, "speed": 0.03 }},
           {"x": 1820, "y": 244, "w": 100, "h": 12, "color": "skyblue",
-            "options": { "isMoving": true, "rangeX": 70, "speed": 0.03 }},
+            "options": { "isMoving": true, "rangeX": -70, "speed": 0.03 }},
           { "x": 1920, "y": 424, "w": 420, "h": 36, "color": "indigo" },
           
           { "x": 2400, "y": 350, "w": 80, "h": 12, "color": "gold",

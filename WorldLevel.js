@@ -37,10 +37,11 @@ drawWorld() {
   for (const p of this.platforms) {
     p.update(); // Update moving/disappearing platforms
     if (p.isDisappearing && !p.isVisible) continue;
-    if (p.color) {
-      fill(p.color);
+    let c = color(p.color || this.theme.platform);
+    if (p.isDisappearing) {
+      fill(red(c), green(c), blue(c), p.alpha * 255);
     } else {
-      fill(this.theme.platform);
+      fill(c);
     }
     rect(p.x, p.y, p.w, p.h); // x,y = top-left [web:234]
   }
