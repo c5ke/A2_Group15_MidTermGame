@@ -8,16 +8,18 @@ class Star {
   }
 
   update(player) {
-    if (this.collected) return;
+    this.angle += 0.05;
+
+    if (this.collected) return false;
 
     // Simple distance-based collision
     let d = dist(player.x, player.y, this.x, this.y);
     if (d < player.r + this.r) {
       this.collected = true;
       player.starsCollected++;
+      return true;
     }
-    
-    this.angle += 0.05;
+    return false;
   }
 
   draw() {

@@ -27,6 +27,7 @@ let player;
 let cam;
 let collectiblesData;
 let stars = [];
+let totalStarsCollected = 0;
 
 function preload() {
   allLevelsData = loadJSON("levels.json"); // levels.json beside index.html [web:122]
@@ -48,7 +49,8 @@ function loadLevel(i) {
   player = new BlobPlayer();
   player.spawnFromLevel(level);
 
-  // Initialize stars from JSON
+  // Initialize stars from JSON (full reset on level load)
+  totalStarsCollected = 0;
   stars = [];
   if (collectiblesData && collectiblesData.stars) {
     for (let s of collectiblesData.stars) {
@@ -61,17 +63,29 @@ function loadLevel(i) {
   cam.clampToWorld(level.w, level.h);
 }
 
+function respawnPlayer() {
+  player = new BlobPlayer();
+  player.spawnFromLevel(level);
+  player.starsCollected = totalStarsCollected;
+
+  cam.x = player.x - width / 2;
+  cam.y = 0;
+  cam.clampToWorld(level.w, level.h);
+}
+
 function draw() {
   // --- game state ---
   player.update(level);
 
   for (let s of stars) {
-    s.update(player);
+    if (s.update(player)) {
+      totalStarsCollected++;
+    }
   }
 
-  // Fall death → respawn
+  // Fall death → respawn (preserve stars)
   if (player.y - player.r > level.deathY) {
-    loadLevel(levelIndex);
+    respawnPlayer();
     return;
   }
 
