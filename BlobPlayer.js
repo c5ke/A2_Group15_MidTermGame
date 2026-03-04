@@ -87,14 +87,6 @@ class BlobPlayer {
       this.canDoubleJump = false;
     }
 
-    // Apply platform movement if riding one
-    if (this.ridingPlatform && this.ridingPlatform.isMoving) {
-      if (this.ridingPlatform.lastX !== undefined) {
-        this.x += this.ridingPlatform.x - this.ridingPlatform.lastX;
-        this.y += this.ridingPlatform.y - this.ridingPlatform.lastY;
-      }
-    }
-
     // Sprinting logic
     this.isSprinting = keyIsDown(SHIFT) && move !== 0 && this.energy > 0;
     let currentMaxRun = this.maxRun;
@@ -132,9 +124,10 @@ class BlobPlayer {
       h: this.r * 2,
     };
 
-    // move X
+    // move X (ignore moving platforms for side collisions to avoid jitter/glitch)
     box.x += this.vx;
     for (const s of level.platforms) {
+      if (s.isMoving) continue;
       if (BlobPlayer.overlap(box, s)) {
         if (this.vx > 0) box.x = s.x - box.w;
         else if (this.vx < 0) box.x = s.x + s.w;
@@ -162,6 +155,14 @@ class BlobPlayer {
     // write back
     this.x = box.x + box.w / 2;
     this.y = box.y + box.h / 2;
+
+    // Carry the player along with moving platforms only when firmly grounded
+    if (this.onGround && this.ridingPlatform && this.ridingPlatform.isMoving) {
+      if (this.ridingPlatform.lastX !== undefined) {
+        this.x += this.ridingPlatform.x - this.ridingPlatform.lastX;
+        this.y += this.ridingPlatform.y - this.ridingPlatform.lastY;
+      }
+    }
 
     // keep inside world horizontally, allow falling below world
     this.x = constrain(this.x, this.r, level.w - this.r);
