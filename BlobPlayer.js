@@ -57,6 +57,17 @@ class BlobPlayer {
     this.energy = this.maxEnergy;
   }
 
+  spawnAt(x, y) {
+    this.x = x;
+    this.y = y;
+
+    this.vx = 0;
+    this.vy = 0;
+    this.onGround = false;
+    this.canDoubleJump = false;
+    this.ridingPlatform = null;
+  }
+
   tryJump() {
     if (this.onGround && this.energy >= 5) {
       // Scale jump power based on energy (at 0 energy, jump is 50% power)

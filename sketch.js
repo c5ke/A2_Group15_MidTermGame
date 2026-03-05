@@ -30,6 +30,8 @@ let stars = [];
 let totalStarsCollected = 0;
 let gameStarted = false;
 let energyBoostTimer = 0;
+let checkpoint = null;
+let respawnPoint = null;
 
 function preload() {
   allLevelsData = loadJSON("levels.json"); // levels.json beside index.html [web:122]
@@ -60,6 +62,15 @@ function loadLevel(i) {
     }
   }
 
+  if (collectiblesData && collectiblesData.checkpoint) {
+    const c = collectiblesData.checkpoint;
+    checkpoint = new Checkpoint(c.x, c.y);
+  } else {
+    checkpoint = null;
+  }
+
+  respawnPoint = null;
+
   cam.x = player.x - width / 2;
   cam.y = 0;
   cam.clampToWorld(level.w, level.h);
@@ -67,10 +78,17 @@ function loadLevel(i) {
 
 function respawnPlayer() {
   player = new BlobPlayer();
-  player.spawnFromLevel(level);
-  player.starsCollected = totalStarsCollected;
-  player.applyStarEnergyBonus(totalStarsCollected);
-  player.energy = player.maxEnergy;
+  if (respawnPoint) {
+    player.spawnAt(respawnPoint.x, respawnPoint.y);
+    player.starsCollected = totalStarsCollected;
+    player.applyStarEnergyBonus(totalStarsCollected);
+    player.energy = player.maxEnergy;
+  } else {
+    player.spawnFromLevel(level);
+    player.starsCollected = totalStarsCollected;
+    player.applyStarEnergyBonus(totalStarsCollected);
+    player.energy = player.maxEnergy;
+  }
 
   cam.x = player.x - width / 2;
   cam.y = 0;
@@ -97,6 +115,10 @@ function draw() {
     }
   }
 
+  if (checkpoint && checkpoint.update(player)) {
+    respawnPoint = { x: checkpoint.x + 2, y: checkpoint.y - player.r };
+  }
+
   // Fall death → respawn (preserve stars)
   if (player.y - player.r > level.deathY) {
     respawnPlayer();
@@ -111,6 +133,7 @@ function draw() {
   // --- draw ---
   cam.begin();
   level.drawWorld();
+  if (checkpoint) checkpoint.draw();
   for (let s of stars) {
     s.draw();
   }

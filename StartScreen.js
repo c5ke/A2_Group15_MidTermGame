@@ -20,7 +20,7 @@ function drawStartScreen() {
   textFont('Poppins');
   textSize(36);
   textStyle(BOLD);
-  text("Platformer Playtest", VIEW_W / 2, panelY + 32);
+  text("Howard", VIEW_W / 2, panelY + 32);
 
   // Subtitle line
   stroke(100, 150, 255);
