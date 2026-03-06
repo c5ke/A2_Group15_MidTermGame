@@ -1,4 +1,5 @@
 {
+  "startCheckpoint": { "x": 80, "y": 424 },
   "checkpoint": { "x": 4558, "y": 424, "text": "Balance" },
   "stars": [
     { "x": 850, "y": 210 },

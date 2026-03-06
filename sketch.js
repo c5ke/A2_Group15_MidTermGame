@@ -31,6 +31,7 @@ let totalStarsCollected = 0;
 let gameStarted = false;
 let energyBoostTimer = 0;
 let checkpoint = null;
+let startCheckpoint = null;
 let respawnPoint = null;
 let checkpointMessage = null;
 let checkpointMessageTimer = 0;
@@ -55,6 +56,10 @@ function loadLevel(i) {
   player = new BlobPlayer();
   player.spawnFromLevel(level);
 
+  const dropHeight = 220;
+  const groundY = 424 - player.r;
+  player.spawnAt(level.start.x, groundY - dropHeight);
+
   // Initialize stars from JSON (full reset on level load)
   totalStarsCollected = 0;
   stars = [];
@@ -69,6 +74,13 @@ function loadLevel(i) {
     checkpoint = new Checkpoint(c.x, c.y, c.text || "Checkpoint");
   } else {
     checkpoint = null;
+  }
+
+  if (collectiblesData && collectiblesData.startCheckpoint) {
+    const s = collectiblesData.startCheckpoint;
+    startCheckpoint = new Checkpoint(s.x, s.y, null);
+  } else {
+    startCheckpoint = null;
   }
 
   respawnPoint = null;
@@ -121,12 +133,16 @@ function draw() {
   }
 
   if (checkpoint && checkpoint.update(player)) {
-    const wasFirstReach = respawnPoint === null;
     respawnPoint = { x: checkpoint.x + 2, y: checkpoint.y - player.r };
-    if (checkpoint.text && wasFirstReach) {
+    if (checkpoint.text && !checkpoint.messageShown) {
+      checkpoint.messageShown = true;
       checkpointMessage = checkpoint.text;
       checkpointMessageTimer = 0;
     }
+  }
+
+  if (startCheckpoint && startCheckpoint.update(player)) {
+    respawnPoint = { x: startCheckpoint.x + 2, y: startCheckpoint.y - player.r };
   }
 
   // Fall death → respawn (preserve stars)
@@ -143,6 +159,7 @@ function draw() {
   // --- draw ---
   cam.begin();
   level.drawWorld();
+  if (startCheckpoint) startCheckpoint.draw();
   if (checkpoint) checkpoint.draw();
   for (let s of stars) {
     s.draw();
@@ -285,6 +302,8 @@ function keyPressed() {
   if (key === " " || key === "W" || key === "w" || keyCode === UP_ARROW) {
     if (!gameStarted) {
       gameStarted = true;
+      checkpointMessage = "FOCUS";
+      checkpointMessageTimer = 0;
     } else {
       player.tryJump();
     }
@@ -297,5 +316,7 @@ function mousePressed() {
 
   if (isPlayButtonClicked(mouseX, mouseY)) {
     gameStarted = true;
+    checkpointMessage = "FOCUS";
+    checkpointMessageTimer = 0;
   }
 }
