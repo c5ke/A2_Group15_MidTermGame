@@ -483,23 +483,36 @@ function drawLightningZone(zone) {
     const boltTopY = 82;
     const boltBottomY = 500;
 
-    // Glow
-    noStroke();
-    fill(255, 255, 200, 90);
-    rect(cx - 10, boltTopY, 20, boltBottomY - boltTopY, 8);
+    // Zig-zag bolt: build a jagged path using noise-based offsets
+    const steps = 7;
+    const strikeIndex = Math.floor(frameCount / cycleFrames);
+    const pts = [];
+    for (let s = 0; s <= steps; s++) {
+      const t = s / steps;
+      const y = lerp(boltTopY, boltBottomY, t);
+      let x = cx;
+      if (s > 0 && s < steps) {
+        const n = noise(i * 0.37, s * 0.61, strikeIndex * 0.23);
+        const dir = s % 2 === 0 ? -1 : 1;
+        const amp = 30 + n * 30; // 30–60 px sideways
+        x += dir * amp;
+      }
+      pts.push({ x, y });
+    }
 
-    // Bolt shape
-    stroke(255, 245, 160, 220);
-    strokeWeight(3);
+    // Outer glow stroke (same zig-zag path, thicker + softer)
+    stroke(255, 255, 220, 140);
+    strokeWeight(9);
     noFill();
     beginShape();
-    vertex(cx, boltTopY);
-    vertex(cx - 12, boltTopY + 55);
-    vertex(cx + 6, boltTopY + 100);
-    vertex(cx - 16, boltTopY + 160);
-    vertex(cx + 10, boltTopY + 220);
-    vertex(cx - 8, boltTopY + 290);
-    vertex(cx + 4, boltBottomY);
+    for (const p of pts) vertex(p.x, p.y);
+    endShape();
+
+    // Inner bright core
+    stroke(255, 250, 180, 255);
+    strokeWeight(3);
+    beginShape();
+    for (const p of pts) vertex(p.x, p.y);
     endShape();
   }
   noStroke();
