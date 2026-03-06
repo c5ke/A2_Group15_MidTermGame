@@ -37,6 +37,7 @@ class BlobPlayer {
     this.starsCollected = 0;
     this.canDoubleJump = false;
     this.ridingPlatform = null;
+    this.inRain = false;
   }
 
   spawnFromLevel(level) {
@@ -69,9 +70,10 @@ class BlobPlayer {
   }
 
   tryJump() {
+    const rainFactor = this.inRain ? 0.65 : 1;
     if (this.onGround && this.energy >= 5) {
       // Scale jump power based on energy (at 0 energy, jump is 50% power)
-      const energyFactor = map(this.energy, 0, this.maxEnergy, 0.5, 1.0);
+      const energyFactor = map(this.energy, 0, this.maxEnergy, 0.5, 1.0) * rainFactor;
       this.vy = this.jumpV * energyFactor;
       this.onGround = false;
       this.canDoubleJump = true; // Allow double jump after first jump
@@ -79,8 +81,8 @@ class BlobPlayer {
       this.ridingPlatform = null;
     } else if (!this.onGround && this.canDoubleJump && this.energy > this.maxEnergy / 2) {
       // Double jump logic: only if in air, has double jump flag, and > 50% energy
-      const energyFactor = map(this.energy, 0, this.maxEnergy, 0.5, 1.0);
-      this.vy = this.jumpV * energyFactor * 0.8; // slightly weaker than normal jump
+      const energyFactor = map(this.energy, 0, this.maxEnergy, 0.5, 1.0) * 0.8 * rainFactor;
+      this.vy = this.jumpV * energyFactor;
       this.canDoubleJump = false; // consume the double jump
       this.energy = max(0, this.energy - this.energyDoubleJumpCost);
       this.ridingPlatform = null;
@@ -109,9 +111,10 @@ class BlobPlayer {
     }
 
     // Scale speed based on energy (at 0 energy, speed is 60% of normal)
+    const rainFactor = this.inRain ? 0.55 : 1;
     const energySpeedFactor = map(this.energy, 0, this.maxEnergy, 0.6, 1.0);
-    const effectiveAccel = this.accel * (this.isSprinting ? 1.5 : 1.0) * energySpeedFactor;
-    const effectiveMaxRun = currentMaxRun * energySpeedFactor;
+    const effectiveAccel = this.accel * (this.isSprinting ? 1.5 : 1.0) * energySpeedFactor * rainFactor;
+    const effectiveMaxRun = currentMaxRun * energySpeedFactor * rainFactor;
 
     // Energy regeneration
     if (!this.isSprinting) {

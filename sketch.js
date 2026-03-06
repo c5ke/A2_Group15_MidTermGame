@@ -35,6 +35,8 @@ let startCheckpoint = null;
 let respawnPoint = null;
 let checkpointMessage = null;
 let checkpointMessageTimer = 0;
+let rainZone = null;
+let checkpointTpTargets = [];
 
 function preload() {
   allLevelsData = loadJSON("levels.json"); // levels.json beside index.html [web:122]
@@ -87,6 +89,28 @@ function loadLevel(i) {
   checkpointMessage = null;
   checkpointMessageTimer = 0;
 
+  if (collectiblesData && collectiblesData.rainZone) {
+    rainZone = collectiblesData.rainZone;
+  } else {
+    rainZone = null;
+  }
+
+  checkpointTpTargets = [];
+  if (startCheckpoint) {
+    checkpointTpTargets.push({
+      label: "Start",
+      x: startCheckpoint.x + 2,
+      y: startCheckpoint.y - 26,
+    });
+  }
+  if (checkpoint) {
+    checkpointTpTargets.push({
+      label: checkpoint.text || "Checkpoint",
+      x: checkpoint.x + 2,
+      y: checkpoint.y - 26,
+    });
+  }
+
   cam.x = player.x - width / 2;
   cam.y = 0;
   cam.clampToWorld(level.w, level.h);
@@ -121,6 +145,12 @@ function draw() {
   }
 
   // --- game state ---
+  if (rainZone) {
+    player.inRain = player.x >= rainZone.startX && player.x <= rainZone.endX;
+  } else {
+    player.inRain = false;
+  }
+
   player.update(level);
 
   for (let s of stars) {
@@ -159,6 +189,7 @@ function draw() {
   // --- draw ---
   cam.begin();
   level.drawWorld();
+  if (rainZone) drawRainZone(rainZone);
   if (startCheckpoint) startCheckpoint.draw();
   if (checkpoint) checkpoint.draw();
   for (let s of stars) {
@@ -260,7 +291,38 @@ function draw() {
   
   fill(40, 40, 50);
   text(player.starsCollected, width - 18, starY + 2); // Slight offset for visual alignment with text baseline
-  
+
+  // Debug: teleport to checkpoint buttons (testing only)
+  const tpBtnY = height - 44;
+  const tpBtnH = 32;
+  const tpBtnPad = 8;
+  let tpBtnX = 16;
+  textFont("Inter");
+  textStyle(NORMAL);
+  textSize(11);
+  fill(80, 80, 90);
+  textAlign(LEFT, TOP);
+  text("TP:", 16, tpBtnY - 14);
+  for (let i = 0; i < checkpointTpTargets.length; i++) {
+    const t = checkpointTpTargets[i];
+    const btnW = textWidth(t.label) + 20;
+    const hover = mouseX >= tpBtnX && mouseX <= tpBtnX + btnW && mouseY >= tpBtnY && mouseY <= tpBtnY + tpBtnH;
+    if (hover) {
+      fill(100, 140, 200);
+    } else {
+      fill(70, 90, 130);
+    }
+    stroke(50, 70, 100);
+    strokeWeight(1);
+    rect(tpBtnX, tpBtnY, btnW, tpBtnH, 6);
+    fill(255);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    text(t.label, tpBtnX + btnW / 2, tpBtnY + tpBtnH / 2);
+    textAlign(LEFT, TOP);
+    tpBtnX += btnW + tpBtnPad;
+  }
+
   // Checkpoint message (fade in, hold, fade out)
   if (checkpointMessage) {
     checkpointMessageTimer++;
@@ -298,6 +360,68 @@ function draw() {
   noStroke();
 }
 
+function drawRainZone(zone) {
+  const left = max(zone.startX, cam.x - 50);
+  const right = min(zone.endX, cam.x + width + 50);
+  if (left >= right) return;
+
+  noStroke();
+
+  // Clouds (grey puffs along the rain zone)
+  const cloudBases = [];
+  for (let x = zone.startX; x <= zone.endX; x += 280) {
+    cloudBases.push(x + ((x * 0.1) % 120));
+  }
+  fill(140, 150, 165, 200);
+  const cloudWidth = 55;
+  for (const cx of cloudBases) {
+    if (cx < left - 80 || cx > right + 80) continue;
+    ellipse(cx, 45, 90, 35);
+    ellipse(cx - 35, 55, 70, 28);
+    ellipse(cx + 40, 52, 75, 30);
+    ellipse(cx - 10, 38, 55, 25);
+    ellipse(cx + 25, 40, 50, 22);
+  }
+
+  // Rain only under each cloud — dense, irregular grid to avoid blank strips
+  const rainSpeed = 2.5;
+  const cloudBottomY = 82;
+  const rainFloorY = 500;
+  const rainHeight = rainFloorY - cloudBottomY + 20;
+  noStroke();
+
+  for (const cx of cloudBases) {
+    if (cx + cloudWidth < left || cx - cloudWidth > right) continue;
+    let wx = cx - cloudWidth;
+    let col = 0;
+    while (wx <= cx + cloudWidth) {
+      const step = 8 + (col % 5);
+      const colOffset = (wx * 17 + col * 7) % 100;
+      const numDrops = 9;
+      for (let d = 0; d < numDrops; d++) {
+        const phaseSeed = (wx * 23 + d * 41 + colOffset) % 997;
+        const phase = (frameCount * rainSpeed + phaseSeed) % rainHeight;
+        const y = cloudBottomY + phase;
+        const xJitter = ((wx * 11 + d * 19) % 13) - 6;
+        const x = wx + xJitter + (phase * 0.015);
+        const dropH = 9 + (phaseSeed % 4);
+        const dropW = 2 + (phaseSeed % 5) * 0.25;
+        const alpha = 120 + (phaseSeed + wx) % 70;
+        fill(200, 220, 240, alpha);
+        push();
+        translate(x, y);
+        ellipse(0, 0, dropW, dropH);
+        fill(255, 255, 255, alpha * 0.35);
+        ellipse(-dropW * 0.2, -dropH * 0.2, dropW * 0.5, dropH * 0.4);
+        pop();
+      }
+      wx += step;
+      col++;
+    }
+  }
+  noStroke();
+}
+
 function keyPressed() {
   if (key === " " || key === "W" || key === "w" || keyCode === UP_ARROW) {
     if (!gameStarted) {
@@ -312,11 +436,31 @@ function keyPressed() {
 }
 
 function mousePressed() {
-  if (gameStarted) return;
+  if (!gameStarted) {
+    if (isPlayButtonClicked(mouseX, mouseY)) {
+      gameStarted = true;
+      checkpointMessage = "FOCUS";
+      checkpointMessageTimer = 0;
+    }
+    return;
+  }
 
-  if (isPlayButtonClicked(mouseX, mouseY)) {
-    gameStarted = true;
-    checkpointMessage = "FOCUS";
-    checkpointMessageTimer = 0;
+  // Debug: teleport to checkpoint (testing only)
+  const tpBtnY = height - 44;
+  const tpBtnH = 32;
+  const tpBtnPad = 8;
+  let tpBtnX = 16;
+  for (let i = 0; i < checkpointTpTargets.length; i++) {
+    const t = checkpointTpTargets[i];
+    const btnW = textWidth(t.label) + 20;
+    if (mouseX >= tpBtnX && mouseX <= tpBtnX + btnW && mouseY >= tpBtnY && mouseY <= tpBtnY + tpBtnH) {
+      player.x = t.x;
+      player.y = t.y;
+      player.vx = 0;
+      player.vy = 0;
+      respawnPoint = { x: t.x, y: t.y };
+      return;
+    }
+    tpBtnX += btnW + tpBtnPad;
   }
 }
