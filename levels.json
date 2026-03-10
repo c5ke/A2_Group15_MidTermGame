@@ -19,147 +19,105 @@
         { "x": 650, "y": 304, "w": 90, "h": 12, "color": "dodgerblue" },
         { "x": 850, "y": 244, "w": 130, "h": 12, "color": "purple" },
         { "x": 1140, "y": 200, "w": 130, "h": 12, "color": "cyan" },
-        { "x": 1200, "y": 354, "w": 120, "h": 12, "color": "brown" },
-        {
-          "x": 1500,
-          "y": 284,
-          "w": 110,
-          "h": 12,
-          "color": "darkcyan",
-          "options": { "isMoving": true, "rangeX": 80, "speed": 0.03 }
-        },
-        {
-          "x": 1820,
-          "y": 244,
-          "w": 100,
-          "h": 12,
-          "color": "skyblue",
-          "options": { "isMoving": true, "rangeX": -70, "speed": 0.03 }
-        },
+        { "x": 1500, "y": 284, "w": 110, "h": 12, "color": "darkcyan" },
+        { "x": 1820, "y": 244, "w": 100, "h": 12, "color": "skyblue" },
         { "x": 1920, "y": 424, "w": 420, "h": 36, "color": "indigo" },
 
-        {
-          "x": 2400,
-          "y": 350,
-          "w": 80,
-          "h": 12,
-          "color": "gold",
-          "options": {
-            "isDisappearing": true,
-            "visibleDuration": 90,
-            "hiddenDuration": 90,
-            "timerOffset": 0
-          }
-        },
-        {
-          "x": 2550,
-          "y": 280,
-          "w": 80,
-          "h": 12,
-          "color": "gold",
-          "options": {
-            "isDisappearing": true,
-            "visibleDuration": 90,
-            "hiddenDuration": 90,
-            "timerOffset": 45
-          }
-        },
-        {
-          "x": 2700,
-          "y": 210,
-          "w": 80,
-          "h": 12,
-          "color": "gold",
-          "options": {
-            "isDisappearing": true,
-            "visibleDuration": 90,
-            "hiddenDuration": 90,
-            "timerOffset": 90
-          }
-        },
-        {
-          "x": 2900,
-          "y": 140,
-          "w": 80,
-          "h": 12,
-          "color": "gold",
-          "options": {
-            "isDisappearing": true,
-            "visibleDuration": 90,
-            "hiddenDuration": 90,
-            "timerOffset": 135
-          }
-        },
-        {
-          "x": 3100,
-          "y": 200,
-          "w": 110,
-          "h": 14,
-          "color": "tomato",
-          "options": { "isMoving": true, "rangeX": 70, "speed": 0.03 }
-        },
-        {
-          "x": 3350,
-          "y": 260,
-          "w": 100,
-          "h": 14,
-          "color": "mediumseagreen",
-          "options": { "isMoving": true, "rangeY": 60, "speed": 0.035 }
-        },
-        {
-          "x": 3550,
-          "y": 220,
-          "w": 90,
-          "h": 14,
-          "color": "slateblue",
-          "options": {
-            "isMoving": true,
-            "rangeX": 60,
-            "rangeY": 40,
-            "speed": 0.032
-          }
-        },
+        { "x": 2400, "y": 350, "w": 80, "h": 12, "color": "gold" },
+        { "x": 2550, "y": 280, "w": 80, "h": 12, "color": "gold" },
+        { "x": 2700, "y": 210, "w": 80, "h": 12, "color": "gold" },
+        { "x": 2900, "y": 140, "w": 80, "h": 12, "color": "gold" },
+        { "x": 3100, "y": 200, "w": 110, "h": 14, "color": "tomato" },
+        { "x": 3350, "y": 260, "w": 100, "h": 14, "color": "mediumseagreen" },
+        { "x": 3550, "y": 220, "w": 90, "h": 14, "color": "slateblue" },
         {
           "x": 3800,
           "y": 380,
-          "w": 200,
+          "w": 95,
           "h": 30,
           "color": "darkslategray"
         },
-        {
-          "x": 4050,
-          "y": 320,
-          "w": 90,
-          "h": 14,
-          "color": "peru",
-          "options": { "isMoving": true, "rangeY": 25, "speed": 0.02 }
-        },
-        {
-          "x": 4180,
-          "y": 320,
-          "w": 90,
-          "h": 14,
-          "color": "peru"
-        },
-        {
-          "x": 4310,
-          "y": 320,
-          "w": 90,
-          "h": 14,
-          "color": "peru",
-          "options": {
-            "isMoving": true,
-            "rangeY": 25,
-            "speed": 0.02,
-            "reverse": true
-          }
-        },
+        { "x": 3930, "y": 320, "w": 50, "h": 14, "color": "peru" },
+        { "x": 4165, "y": 320, "w": 50, "h": 14, "color": "peru" },
+        { "x": 4385, "y": 320, "w": 50, "h": 14, "color": "peru" },
         {
           "x": 4520,
           "y": 424,
           "w": 200,
           "h": 10,
           "color": "darkslategray"
+        },
+        {
+          "x": 5000,
+          "y": 360,
+          "w": 100,
+          "h": 12,
+          "color": "darkcyan",
+          "options": { "isMoving": true, "rangeX": 80, "speed": 0.03 }
+        },
+        {
+          "x": 5300,
+          "y": 300,
+          "w": 90,
+          "h": 12,
+          "color": "skyblue",
+          "options": { "isMoving": true, "rangeY": 50, "speed": 0.035 }
+        },
+        {
+          "x": 5600,
+          "y": 340,
+          "w": 100,
+          "h": 12,
+          "color": "mediumseagreen",
+          "options": { "isMoving": true, "rangeX": -70, "speed": 0.03 }
+        },
+        {
+          "x": 6000,
+          "y": 280,
+          "w": 90,
+          "h": 12,
+          "color": "tomato",
+          "options": { "isMoving": true, "rangeY": 60, "speed": 0.032 }
+        },
+        {
+          "x": 6400,
+          "y": 320,
+          "w": 110,
+          "h": 12,
+          "color": "slateblue",
+          "options": { "isMoving": true, "rangeX": 70, "rangeY": 40, "speed": 0.028 }
+        },
+        {
+          "x": 6900,
+          "y": 260,
+          "w": 95,
+          "h": 12,
+          "color": "peru",
+          "options": { "isMoving": true, "rangeX": -60, "speed": 0.03 }
+        },
+        {
+          "x": 7300,
+          "y": 340,
+          "w": 100,
+          "h": 12,
+          "color": "darkcyan",
+          "options": { "isMoving": true, "rangeY": 55, "speed": 0.025 }
+        },
+        {
+          "x": 7800,
+          "y": 300,
+          "w": 90,
+          "h": 12,
+          "color": "mediumseagreen",
+          "options": { "isMoving": true, "rangeX": 65, "speed": 0.03 }
+        },
+        {
+          "x": 8300,
+          "y": 260,
+          "w": 100,
+          "h": 12,
+          "color": "skyblue",
+          "options": { "isMoving": true, "rangeY": 45, "speed": 0.03 }
         },
         { "x": 13000, "y": 424, "w": 800, "h": 36, "color": "green" }
       ]
