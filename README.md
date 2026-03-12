@@ -3,11 +3,13 @@
 ---
 
 ## Authors
+
 Group 15A
 
 ---
 
 ## Description
+
 **Daisy** is a 2D side‑scrolling platformer that explores what it feels like to move through the world while managing limited cognitive/physical energy.
 
 You control a soft blob character moving through increasingly complex environments. Core mechanics are built around:
@@ -21,9 +23,10 @@ You control a soft blob character moving through increasingly complex environmen
 
 Overall, the game aims to combine readable platforming with moment‑to‑moment changes in control, prompting players to notice how much cognitive effort “simple” movement can demand.
 
-
 ---
+
 ## Setup and Interaction Instructions
+
 **Running the game**
 
 Play the game here: https://c5ke.github.io/A2_Group15_MidTermGame/
@@ -36,23 +39,23 @@ Play the game here: https://c5ke.github.io/A2_Group15_MidTermGame/
 - **Reset level**: **R**
 
 **Game flow**
-- Press **Play** (button or Space/W/Up) to start. 
+
+- Press **Play** (button or Space/W/Up) to start.
 - Collect **stars** to increase your maximum energy.
 - Reach **sunflowers** to set respawn checkpoints.
-- Moving through **rain** slows you down.
-- Getting hit by **lightning** temporarily inverts left/right controls.
-
-
 
 ---
 
 ## Iteration Notes
+
 **Post‑Playtest**
 
+- **Level Structure**: Levels were redesigned to each stage introducing a single core challenge that represents a different cognitive function rather than multiple challenges at once. The current first level represents balance.
 - **Checkpoints**: Introduced sunflower checkpoints that change the respawn point.
-- **Additional interactive elements**: Added the rain that slows down and the lightning that inverts controls.
+- **Platforms**: Adjusted platforms/obstacles in the beginning of the game so that the player needs to use the double jump to progress through the level.
 
 **Post‑Showcase**
+
 - TBD
 
 ---
@@ -62,8 +65,9 @@ Play the game here: https://c5ke.github.io/A2_Group15_MidTermGame/
 - Used W5 Example 5 as a template and used GenAI to generate code.
 
 ---
+
 # Assets
 
 ---
-## References
 
+## References
