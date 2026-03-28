@@ -45,6 +45,8 @@ let checkpointMessageTimer = 0;
 let rainZone = null;
 let lightningZone = null;
 let checkpointTpTargets = [];
+let checkpointsDrawOrder = [];
+let checkpointsUpdateOrder = [];
 
 function preload() {
   allLevelsData = loadJSON("levels.json"); // levels.json beside index.html [web:122]
@@ -90,26 +92,41 @@ function loadLevel(i) {
     }
   }
 
-  if (collectiblesData && collectiblesData.checkpoint) {
-    const c = collectiblesData.checkpoint;
-    checkpoint = new Checkpoint(c.x, c.y, c.text || "Checkpoint");
-  } else {
-    checkpoint = null;
-  }
-
-  if (collectiblesData && collectiblesData.checkpoint2) {
-    const c2 = collectiblesData.checkpoint2;
-    checkpoint2 = new Checkpoint(c2.x, c2.y, c2.text || "Checkpoint");
-  } else {
-    checkpoint2 = null;
-  }
-
+  // Each uses Checkpoint.js: ungrown bud + sun beam until touched, then bloom (useBeamAndGrow on by default).
   if (collectiblesData && collectiblesData.startCheckpoint) {
     const s = collectiblesData.startCheckpoint;
     startCheckpoint = new Checkpoint(s.x, s.y, s.text || null);
   } else {
     startCheckpoint = null;
   }
+
+  if (collectiblesData && collectiblesData.checkpoint) {
+    const c = collectiblesData.checkpoint;
+    checkpoint = new Checkpoint(c.x, c.y, c.text || "Checkpoint", {
+      prerequisite: startCheckpoint,
+    });
+  } else {
+    checkpoint = null;
+  }
+
+  if (collectiblesData && collectiblesData.checkpoint2) {
+    const c2 = collectiblesData.checkpoint2;
+    checkpoint2 = new Checkpoint(c2.x, c2.y, c2.text || "Checkpoint", {
+      prerequisite: checkpoint,
+    });
+  } else {
+    checkpoint2 = null;
+  }
+
+  checkpointsDrawOrder = [];
+  if (startCheckpoint) checkpointsDrawOrder.push(startCheckpoint);
+  if (checkpoint) checkpointsDrawOrder.push(checkpoint);
+  if (checkpoint2) checkpointsDrawOrder.push(checkpoint2);
+
+  checkpointsUpdateOrder = [];
+  if (checkpoint) checkpointsUpdateOrder.push(checkpoint);
+  if (checkpoint2) checkpointsUpdateOrder.push(checkpoint2);
+  if (startCheckpoint) checkpointsUpdateOrder.push(startCheckpoint);
 
   respawnPoint = null;
   checkpointMessage = null;
@@ -128,25 +145,17 @@ function loadLevel(i) {
   }
 
   checkpointTpTargets = [];
-  if (startCheckpoint) {
+  const sunflowerTpOrder = [
+    startCheckpoint,
+    checkpoint,
+    checkpoint2,
+  ];
+  for (const cp of sunflowerTpOrder) {
+    if (!cp) continue;
     checkpointTpTargets.push({
-      label: startCheckpoint.text || "Balance",
-      x: startCheckpoint.x + 2,
-      y: startCheckpoint.y - 26,
-    });
-  }
-  if (checkpoint) {
-    checkpointTpTargets.push({
-      label: checkpoint.text || "Checkpoint",
-      x: checkpoint.x + 2,
-      y: checkpoint.y - 26,
-    });
-  }
-  if (checkpoint2) {
-    checkpointTpTargets.push({
-      label: checkpoint2.text || "Checkpoint 2",
-      x: checkpoint2.x + 2,
-      y: checkpoint2.y - 26,
+      label: cp.text || "Checkpoint",
+      x: cp.x + 2,
+      y: cp.y - 26,
     });
   }
   // TP to end of map (platform at x 13000–13800) — before Lightning so End stays on-screen
@@ -221,29 +230,18 @@ function draw() {
     }
   }
 
-  if (checkpoint && checkpoint.update(player)) {
-    respawnPoint = { x: checkpoint.x + 2, y: checkpoint.y - player.r };
-    if (checkpoint.text && !checkpoint.messageShown) {
-      checkpoint.messageShown = true;
-      checkpointMessage = checkpoint.text;
+  for (const cp of checkpointsUpdateOrder) {
+    if (!cp.update(player)) continue;
+    respawnPoint = { x: cp.x + 2, y: cp.y - player.r };
+    if (
+      cp !== startCheckpoint &&
+      cp.text &&
+      !cp.messageShown
+    ) {
+      cp.messageShown = true;
+      checkpointMessage = cp.text;
       checkpointMessageTimer = 0;
     }
-  }
-
-  if (checkpoint2 && checkpoint2.update(player)) {
-    respawnPoint = { x: checkpoint2.x + 2, y: checkpoint2.y - player.r };
-    if (checkpoint2.text && !checkpoint2.messageShown) {
-      checkpoint2.messageShown = true;
-      checkpointMessage = checkpoint2.text;
-      checkpointMessageTimer = 0;
-    }
-  }
-
-  if (startCheckpoint && startCheckpoint.update(player)) {
-    respawnPoint = {
-      x: startCheckpoint.x + 2,
-      y: startCheckpoint.y - player.r,
-    };
   }
 
   // Fall death → respawn (preserve stars)
@@ -262,9 +260,9 @@ function draw() {
   level.drawWorld();
   if (rainZone) drawRainZone(rainZone);
   if (lightningZone) drawLightningZone(lightningZone);
-  if (startCheckpoint) startCheckpoint.draw();
-  if (checkpoint) checkpoint.draw();
-  if (checkpoint2) checkpoint2.draw();
+  for (const cp of checkpointsDrawOrder) {
+    cp.draw();
+  }
   drawEndHouse(13770); // small house centered at end
   for (let s of stars) {
     s.draw();
